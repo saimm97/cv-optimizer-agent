@@ -1,0 +1,50 @@
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+}
+
+.spin {
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@keyframes fadeUp {
+  from {
+    opacity: 0;
+    transform: translateY(12px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+.fade {
+  animation: fadeUp 0.5s ease both;
+}
+
+textarea::placeholder {
+  color: #6b7280;
+}
+
+textarea:focus {
+  outline: none;
+  border-color: #d4a056 !important;
+}
+
+@media (max-width: 720px) {
+  .cv-grid,
+  .cv-two-col {
+    grid-template-columns: 1fr !important;
+  }
+}
