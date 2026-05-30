@@ -111,8 +111,8 @@ export function AtsReport({ ats, tips = [] }) {
                 key={i}
                 style={{
                   display: "grid",
-                  gridTemplateColumns: "1fr auto auto",
-                  gap: 12,
+                  gridTemplateColumns: "1fr auto auto auto",
+                  gap: 10,
                   alignItems: "center",
                   padding: "8px 10px",
                   borderRadius: 8,
@@ -123,6 +123,39 @@ export function AtsReport({ ats, tips = [] }) {
                   {row.matched ? "✓ " : "✕ "}
                   {row.keyword}
                 </span>
+                {row.evidence === "demonstrated" ? (
+                  <span
+                    style={{
+                      fontSize: 9.5,
+                      fontWeight: 700,
+                      letterSpacing: 0.3,
+                      color: theme.green,
+                      border: `1px solid ${theme.green}66`,
+                      borderRadius: 5,
+                      padding: "1px 6px",
+                    }}
+                    title="Proven in your experience section"
+                  >
+                    PROVEN
+                  </span>
+                ) : row.evidence === "listed" ? (
+                  <span
+                    style={{
+                      fontSize: 9.5,
+                      fontWeight: 700,
+                      letterSpacing: 0.3,
+                      color: theme.faint,
+                      border: `1px solid ${theme.border}`,
+                      borderRadius: 5,
+                      padding: "1px 6px",
+                    }}
+                    title="Only appears in your skills list — back it up in experience"
+                  >
+                    LISTED
+                  </span>
+                ) : (
+                  <span />
+                )}
                 <span
                   style={{
                     fontSize: 10.5,
@@ -143,7 +176,7 @@ export function AtsReport({ ats, tips = [] }) {
                     fontSize: 11,
                     fontWeight: 600,
                     color: row.matched ? theme.green : theme.red,
-                    minWidth: 64,
+                    minWidth: 58,
                     textAlign: "right",
                   }}
                 >

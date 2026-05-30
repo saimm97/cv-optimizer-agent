@@ -119,6 +119,75 @@ const SKILL_LEXICON = {
   "Project Management": ["project management", "pmp", "stakeholder management"],
   Leadership: ["leadership", "mentoring", "mentorship", "team lead", "tech lead", "people management"],
   Communication: ["communication", "stakeholder", "presentation", "cross-functional"],
+  Bash: ["bash", "shell", "zsh", "powershell"],
+  ".NET Core": [".net core", "dotnet core"],
+  Svelte: ["svelte", "sveltekit"],
+  Remix: ["remix"],
+  Nuxt: ["nuxt", "nuxt.js"],
+  Webpack: ["webpack"],
+  Vite: ["vite"],
+  Babel: ["babel"],
+  Sass: ["sass", "scss"],
+  Bootstrap: ["bootstrap"],
+  "Material UI": ["material ui", "mui", "material-ui"],
+  Redux: ["redux", "redux toolkit"],
+  "React Native": ["react native"],
+  Flutter: ["flutter", "dart"],
+  iOS: ["ios", "swiftui", "uikit", "xcode"],
+  Android: ["android", "jetpack compose"],
+  Firebase: ["firebase", "firestore"],
+  Supabase: ["supabase"],
+  Vercel: ["vercel"],
+  Netlify: ["netlify"],
+  Heroku: ["heroku"],
+  Nginx: ["nginx"],
+  Prometheus: ["prometheus"],
+  Grafana: ["grafana"],
+  Datadog: ["datadog"],
+  Splunk: ["splunk"],
+  Sentry: ["sentry"],
+  OAuth: ["oauth", "oauth2", "openid", "sso", "saml"],
+  JWT: ["jwt", "json web token"],
+  WebSockets: ["websocket", "websockets", "socket.io"],
+  OpenAPI: ["openapi", "swagger"],
+  Maven: ["maven"],
+  Gradle: ["gradle"],
+  ".NET": [".net framework"],
+  Hibernate: ["hibernate", "jpa"],
+  Celery: ["celery"],
+  "Vector Databases": ["pinecone", "weaviate", "vector database", "vector db", "pgvector", "chroma"],
+  RAG: ["rag", "retrieval augmented generation", "retrieval-augmented"],
+  LangChain: ["langchain", "llamaindex"],
+  Databricks: ["databricks"],
+  BigQuery: ["bigquery"],
+  Redshift: ["redshift"],
+  Athena: ["athena"],
+  Fivetran: ["fivetran", "stitch"],
+  "Data Warehousing": ["data warehouse", "data warehousing", "data lake", "lakehouse"],
+  "Data Modeling": ["data modeling", "dimensional modeling", "star schema"],
+  "Statistical Analysis": ["statistics", "statistical analysis", "regression", "hypothesis testing"],
+  "Time Series": ["time series", "forecasting"],
+  "Recommendation Systems": ["recommendation", "recommender", "ranking"],
+  MLOps: ["mlops", "model deployment", "model serving", "mlflow"],
+  "Cloud Architecture": ["cloud architecture", "serverless", "lambda", "well-architected"],
+  "Incident Management": ["incident management", "on-call", "oncall", "sre", "site reliability"],
+  Observability: ["observability", "monitoring", "logging", "tracing", "telemetry"],
+  Cybersecurity: ["security", "cybersecurity", "infosec", "penetration testing", "owasp", "vulnerability"],
+  Compliance: ["compliance", "gdpr", "hipaa", "soc 2", "soc2", "pci"],
+  "Stakeholder Management": ["stakeholder management", "stakeholder engagement"],
+  "Go-to-Market": ["go-to-market", "gtm", "product launch"],
+  "User Research": ["user research", "usability", "customer interviews", "user testing"],
+  Analytics: ["analytics", "google analytics", "mixpanel", "amplitude", "segment"],
+  "Growth": ["growth", "growth hacking", "funnel", "retention", "activation"],
+  "Content Strategy": ["content strategy", "copywriting", "content marketing"],
+  "Email Marketing": ["email marketing", "mailchimp", "hubspot", "marketo"],
+  "Paid Acquisition": ["ppc", "google ads", "facebook ads", "paid acquisition", "sem"],
+  Wireframing: ["wireframe", "wireframing", "prototyping", "prototype"],
+  "Design Systems": ["design system", "design systems", "component library"],
+  Accessibility: ["accessibility", "a11y", "wcag"],
+  Photoshop: ["photoshop"],
+  Illustrator: ["illustrator"],
+  "After Effects": ["after effects", "motion graphics"],
 };
 
 // Reverse alias index with a precompiled, boundary-aware regex per alias.
@@ -347,11 +416,38 @@ function scoreFromChecks(checks) {
 }
 
 /**
+ * Split a CV into its "skills list" block(s) and the rest of the document.
+ * A keyword that only appears in a skills list is weaker evidence than one
+ * that appears in the experience/projects narrative (where it's demonstrated).
+ */
+function splitSkillsSection(cvText) {
+  const lines = cvText.split(/\n/);
+  const skillsLines = [];
+  const bodyLines = [];
+  const skillsHeader = /^\s*(technical\s+skills|core\s+skills|skills|technologies|tech\s+stack|competencies|tools)\b/i;
+  const otherHeader = /^\s*(experience|employment|work\s+history|education|projects|certifications|summary|profile|objective|awards|publications|languages|interests)\b/i;
+
+  let inSkills = false;
+  for (const line of lines) {
+    if (skillsHeader.test(line)) {
+      inSkills = true;
+      skillsLines.push(line);
+      continue;
+    }
+    if (inSkills && otherHeader.test(line)) inSkills = false;
+    (inSkills ? skillsLines : bodyLines).push(line);
+  }
+  return { skillsSection: skillsLines.join("\n"), body: bodyLines.join("\n") };
+}
+
+/**
  * Main entry point. Pure function: same inputs -> same output.
  */
 export function runAtsAnalysis(cvText, jdText) {
   const jdSkills = detectSkills(jdText);
   const cvSkills = detectSkills(cvText);
+  const { body } = splitSkillsSection(cvText);
+  const bodySkills = detectSkills(body);
 
   // Salient generic terms from the JD that aren't already lexicon skills.
   const salient = extractSalientTerms(jdText);
@@ -371,12 +467,16 @@ export function runAtsAnalysis(cvText, jdText) {
   const keywordTable = [...jdSkills.entries()]
     .map(([keyword, jdCount]) => {
       const cvCount = cvSkills.get(keyword) || 0;
+      const matched = cvCount > 0;
       return {
         keyword,
         jdCount,
         cvCount,
-        matched: cvCount > 0,
+        matched,
         importance: jdCount >= 3 ? "high" : jdCount === 2 ? "medium" : "low",
+        // "demonstrated" = appears in the experience/projects narrative;
+        // "listed" = only found in a skills list; "" = not in CV.
+        evidence: matched ? (bodySkills.has(keyword) ? "demonstrated" : "listed") : "",
       };
     })
     .sort((a, b) => {
@@ -418,4 +518,4 @@ export function runAtsAnalysis(cvText, jdText) {
   };
 }
 
-export const __testables = { detectSkills, extractSalientTerms, analyzeFormatting, normalizeText };
+export const __testables = { detectSkills, extractSalientTerms, analyzeFormatting, normalizeText, splitSkillsSection };

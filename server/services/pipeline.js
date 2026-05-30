@@ -16,6 +16,7 @@ import { callClaudeJson, hasApiKey } from "./anthropic.js";
 import { runAtsAnalysis } from "./ats.js";
 import { normalizeResult } from "./normalize.js";
 import { buildHeuristicResult } from "./heuristics.js";
+import { verifyOptimization } from "./verify.js";
 import { REQUIREMENTS_SYSTEM_PROMPT, buildRequirementsMessage } from "../prompts/requirements.js";
 import { SYSTEM_PROMPT, buildAnalysisMessage } from "../prompts/analysis.js";
 
@@ -53,7 +54,12 @@ export async function optimizeCv(cvText, jdText) {
     });
 
     // Stage 3: normalize + merge (ATS authoritative on keywords/formatting).
-    return normalizeResult(llm, atsFindings, requirements);
+    const result = normalizeResult(llm, atsFindings, requirements);
+
+    // Stage 4: deterministic integrity check on the optimized CV.
+    result.integrity = verifyOptimization(cvText, result.optimizedCV, result.matchedKeywords);
+
+    return result;
   } catch (err) {
     // The AI step failed (rate limit, outage, bad key). Rather than 500-ing,
     // degrade to the deterministic report so the user still gets value.

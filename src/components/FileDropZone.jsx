@@ -15,8 +15,26 @@ export function FileDropZone({ onFile, file, parsing, label, hint }) {
     }
   };
 
+  const iconCircle = (children, bg) => (
+    <div
+      style={{
+        width: 52,
+        height: 52,
+        borderRadius: 14,
+        display: "flex",
+        alignItems: "center",
+        justifyContent: "center",
+        margin: "0 auto 12px",
+        background: bg,
+      }}
+    >
+      {children}
+    </div>
+  );
+
   return (
     <div
+      className="lift"
       onDragOver={(event) => {
         event.preventDefault();
         setDragging(true);
@@ -25,13 +43,13 @@ export function FileDropZone({ onFile, file, parsing, label, hint }) {
       onDrop={handleDrop}
       onClick={() => inputRef.current?.click()}
       style={{
-        border: `2px dashed ${dragging ? theme.accent : theme.border}`,
-        borderRadius: 12,
-        padding: "32px 20px",
+        border: `1.5px dashed ${dragging ? theme.accent : file ? "rgba(70,201,139,.4)" : theme.border}`,
+        borderRadius: 14,
+        padding: "30px 20px",
         textAlign: "center",
         cursor: "pointer",
-        background: dragging ? "rgba(212,160,86,.05)" : theme.panel,
-        transition: "all .2s",
+        background: dragging ? theme.accentSoft : theme.bgElevated,
+        boxShadow: dragging ? theme.glow : "none",
       }}
     >
       <input
@@ -43,19 +61,21 @@ export function FileDropZone({ onFile, file, parsing, label, hint }) {
       />
       {parsing ? (
         <>
-          <Loader2 size={28} className="spin" style={{ color: theme.accent, marginBottom: 10 }} />
+          {iconCircle(<Loader2 size={24} className="spin" style={{ color: theme.accent }} />, theme.accentSoft)}
           <div style={{ color: theme.dim, fontSize: 14 }}>Reading file…</div>
         </>
       ) : file ? (
         <>
-          <FileText size={28} style={{ color: theme.green, marginBottom: 10 }} />
-          <div style={{ color: theme.text, fontSize: 14, fontWeight: 600 }}>{file.name}</div>
+          {iconCircle(<FileText size={24} style={{ color: theme.green }} />, "rgba(70,201,139,.12)")}
+          <div style={{ color: theme.text, fontSize: 14, fontWeight: 600, wordBreak: "break-word" }}>
+            {file.name}
+          </div>
           <div style={{ color: theme.faint, fontSize: 12, marginTop: 4 }}>Click to replace</div>
         </>
       ) : (
         <>
-          <Upload size={28} style={{ color: theme.faint, marginBottom: 10 }} />
-          <div style={{ color: theme.text, fontSize: 14, fontWeight: 600 }}>{label}</div>
+          {iconCircle(<Upload size={24} style={{ color: theme.accent }} />, theme.accentSoft)}
+          <div style={{ color: theme.text, fontSize: 14.5, fontWeight: 600 }}>{label}</div>
           <div style={{ color: theme.faint, fontSize: 12, marginTop: 4 }}>{hint}</div>
         </>
       )}

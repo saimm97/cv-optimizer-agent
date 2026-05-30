@@ -124,6 +124,7 @@ export function normalizeResult(llm = {}, ats = null, reqs = null) {
       : null,
 
     requirements: reqs || null,
+    integrity: null,
   };
 
   return result;
