@@ -10,9 +10,10 @@ export function Section({ icon: Icon, title, children, defaultOpen = true, count
       style={{
         background: theme.panel,
         border: `1px solid ${theme.border}`,
-        borderRadius: 12,
+        borderRadius: 14,
         marginBottom: 16,
         overflow: "hidden",
+        boxShadow: theme.shadowSoft,
       }}
     >
       <button

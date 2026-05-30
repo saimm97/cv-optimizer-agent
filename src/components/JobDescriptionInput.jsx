@@ -16,7 +16,17 @@ export function JobDescriptionInput({ value, onChange, onFileUpload, jdFile, par
           marginBottom: 10,
         }}
       >
-        <div style={{ display: "flex", alignItems: "center", gap: 7, fontSize: 13, color: theme.dim }}>
+        <div
+          style={{
+            display: "flex",
+            alignItems: "center",
+            gap: 7,
+            fontSize: 12.5,
+            fontWeight: 600,
+            letterSpacing: 0.3,
+            color: theme.dim,
+          }}
+        >
           <Briefcase size={15} style={{ color: theme.accent }} /> JOB DESCRIPTION
         </div>
         <div
@@ -58,17 +68,18 @@ export function JobDescriptionInput({ value, onChange, onFileUpload, jdFile, par
           placeholder="Paste the full job description — responsibilities, requirements, qualifications…"
           style={{
             width: "100%",
-            height: 138,
+            height: 158,
             resize: "none",
-            background: theme.panel,
+            background: theme.bgElevated,
             border: `1px solid ${theme.border}`,
-            borderRadius: 12,
+            borderRadius: 14,
             color: theme.text,
             padding: 16,
             fontSize: 13.5,
             lineHeight: 1.6,
             fontFamily: "inherit",
             boxSizing: "border-box",
+            transition: "border-color .18s ease, box-shadow .18s ease",
           }}
         />
       ) : (

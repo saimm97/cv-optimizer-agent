@@ -2,8 +2,9 @@ import { describe, it, expect } from "vitest";
 import { runAtsAnalysis, __testables } from "./ats.js";
 import { normalizeResult } from "./normalize.js";
 import { extractJson } from "./anthropic.js";
+import { verifyOptimization } from "./verify.js";
 
-const { detectSkills, analyzeFormatting } = __testables;
+const { detectSkills, analyzeFormatting, splitSkillsSection } = __testables;
 
 const SAMPLE_CV = `Jane Doe
 jane.doe@example.com | +1 555 123 4567 | linkedin.com/in/janedoe
@@ -122,6 +123,64 @@ describe("normalizeResult", () => {
   it("coerces string action plans into objects", () => {
     const r = normalizeResult({ actionPlan: ["Add metrics"] }, ats, null);
     expect(r.actionPlan[0]).toMatchObject({ action: "Add metrics", priority: "medium" });
+  });
+});
+
+describe("evidence strength", () => {
+  it("marks a skill in experience as demonstrated and a skill-list-only skill as listed", () => {
+    const r = runAtsAnalysis(SAMPLE_CV, SAMPLE_JD);
+    const python = r.keywordTable.find((k) => k.keyword === "Python");
+    const postgres = r.keywordTable.find((k) => k.keyword === "PostgreSQL");
+    // Python is used in an experience bullet -> demonstrated.
+    expect(python?.evidence).toBe("demonstrated");
+    // (PostgreSQL only appears under SKILLS in the sample, if matched at all.)
+    if (postgres?.matched) expect(postgres.evidence).toBe("listed");
+  });
+
+  it("splits the skills section from the body", () => {
+    const { skillsSection, body } = splitSkillsSection(SAMPLE_CV);
+    expect(skillsSection.toLowerCase()).toContain("postgresql");
+    expect(body.toLowerCase()).toContain("kubernetes");
+  });
+});
+
+describe("verifyOptimization", () => {
+  const original = "Built APIs in Python. Reduced latency. Email: jane@x.com";
+  it("returns null when there is no optimized CV", () => {
+    expect(verifyOptimization(original, "", [])).toBeNull();
+  });
+
+  it("flags a fabricated metric", () => {
+    const opt = "Built APIs in Python, reducing latency by 47% and serving 3M users. Email: jane@x.com";
+    const v = verifyOptimization(original, opt, []);
+    expect(v.clean).toBe(false);
+    expect(v.flags.some((f) => f.type === "Possible fabricated metric")).toBe(true);
+  });
+
+  it("ignores placeholder metrics", () => {
+    const opt = "Built APIs in Python, reducing latency by [X]% for [Y] users. Email: jane@x.com";
+    const v = verifyOptimization(original, opt, []);
+    expect(v.flags.some((f) => f.type === "Possible fabricated metric")).toBe(false);
+  });
+
+  it("flags changed contact details", () => {
+    const opt = "Built APIs in Python. Email: someone-else@evil.com";
+    const v = verifyOptimization(original, opt, []);
+    expect(v.flags.some((f) => f.type === "Changed contact details")).toBe(true);
+  });
+
+  it("reports keywords claimed-matched but absent from the optimized CV", () => {
+    const opt = "Built APIs in Python. Email: jane@x.com";
+    const v = verifyOptimization(original, opt, ["Python", "Kubernetes"]);
+    expect(v.unverifiedKeywords).toContain("Kubernetes");
+    expect(v.unverifiedKeywords).not.toContain("Python");
+  });
+
+  it("is clean for a faithful rewrite", () => {
+    const opt = "Built scalable REST APIs in Python; reduced latency. Email: jane@x.com";
+    const v = verifyOptimization(original, opt, ["Python"]);
+    expect(v.clean).toBe(true);
+    expect(v.score).toBe(100);
   });
 });
 

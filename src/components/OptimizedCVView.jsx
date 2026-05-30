@@ -2,6 +2,7 @@ import { Sparkles, Download, CheckCircle2 } from "lucide-react";
 import { theme } from "../styles/theme";
 import { Section } from "./ui/Section";
 import { CopyButton } from "./ui/CopyButton";
+import { IntegrityPanel } from "./IntegrityPanel";
 import { exportOptimizedCV } from "../utils/export";
 
 export function OptimizedCVView({ result }) {
@@ -69,6 +70,8 @@ export function OptimizedCVView({ result }) {
           </button>
         </div>
       </div>
+
+      <IntegrityPanel integrity={result.integrity} />
 
       {result.changesSummary?.length > 0 && (
         <Section icon={Sparkles} title="What Changed" count={result.changesSummary.length}>
