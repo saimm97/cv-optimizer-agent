@@ -77,9 +77,10 @@ Rules:
 - requirementsCoverage: cover EVERY must-have and the most important nice-to-haves from the rubric. Be honest about partial/missing.
 - bulletRewrites: choose 5-7 of the weakest, most improvable bullets that genuinely exist in the CV.
 - optimizedCV: must be a complete, polished, ready-to-send document — not a summary.
+- TEMPLATE: if a "CV TEMPLATE" is provided in the user message, write optimizedCV to FOLLOW THAT TEMPLATE — replicate its section order, section headings/labels, layout conventions (how the name/contact line, dates, locations, and bullets are arranged), and overall tone. Fill it entirely with the candidate's REAL content. NEVER copy the template's sample data (its names, employers, dates, metrics or contact details) into the output. If the template omits a section the candidate needs, add it in the same style; if it has a section the candidate cannot fill truthfully, omit it. When no template is provided, use a clean, conventional ATS-safe structure.
 - Keep all strings concrete and concise. No fluff.`;
 
-export function buildAnalysisMessage(cvText, jdText, requirements, atsFindings) {
+export function buildAnalysisMessage(cvText, jdText, requirements, atsFindings, templateText) {
   const reqBlock = requirements
     ? JSON.stringify(requirements, null, 2)
     : "(requirement extraction unavailable — derive requirements yourself from the JD)";
@@ -98,6 +99,11 @@ export function buildAnalysisMessage(cvText, jdText, requirements, atsFindings) 
       )
     : "(no deterministic findings)";
 
+  const templateBlock =
+    templateText && templateText.trim().length > 0
+      ? `\n=== CV TEMPLATE (match this structure/format ONLY — do NOT copy its content) ===\n${templateText}\n`
+      : "";
+
   return `Analyze this CV against the JD and produce the full report plus a complete optimized CV.
 
 === STRUCTURED JD REQUIREMENTS (already extracted) ===
@@ -105,7 +111,7 @@ ${reqBlock}
 
 === DETERMINISTIC ATS FINDINGS (ground truth — stay consistent) ===
 ${atsBlock}
-
+${templateBlock}
 === CANDIDATE CV / RESUME ===
 ${cvText}
 

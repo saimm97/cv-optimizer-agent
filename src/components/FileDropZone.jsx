@@ -3,7 +3,7 @@ import { Upload, FileText, Loader2 } from "lucide-react";
 import { theme } from "../styles/theme";
 import { ACCEPTED_FILE_TYPES } from "../utils/fileParser";
 
-export function FileDropZone({ onFile, file, parsing, label, hint }) {
+export function FileDropZone({ onFile, file, parsing, label, hint, minHeight }) {
   const [dragging, setDragging] = useState(false);
   const inputRef = useRef();
 
@@ -43,13 +43,18 @@ export function FileDropZone({ onFile, file, parsing, label, hint }) {
       onDrop={handleDrop}
       onClick={() => inputRef.current?.click()}
       style={{
-        border: `1.5px dashed ${dragging ? theme.accent : file ? "rgba(70,201,139,.4)" : theme.border}`,
+        border: `1.5px dashed ${dragging ? theme.accent : file ? "rgba(52,211,153,.45)" : theme.borderLight}`,
         borderRadius: 14,
         padding: "30px 20px",
         textAlign: "center",
         cursor: "pointer",
         background: dragging ? theme.accentSoft : theme.bgElevated,
         boxShadow: dragging ? theme.glow : "none",
+        minHeight: minHeight || "auto",
+        display: "flex",
+        flexDirection: "column",
+        alignItems: "center",
+        justifyContent: "center",
       }}
     >
       <input

@@ -8,7 +8,7 @@ const MIN_JD_LENGTH = 40;
 
 router.post("/", async (req, res) => {
   try {
-    const { cvText, jdText } = req.body || {};
+    const { cvText, jdText, templateText } = req.body || {};
 
     if (!cvText || typeof cvText !== "string" || cvText.trim().length < MIN_CV_LENGTH) {
       return res
@@ -22,7 +22,8 @@ router.post("/", async (req, res) => {
         .json({ error: `Job description is required and must be at least ${MIN_JD_LENGTH} characters.` });
     }
 
-    const result = await optimizeCv(cvText.trim(), jdText.trim());
+    const template = typeof templateText === "string" ? templateText.trim() : "";
+    const result = await optimizeCv(cvText.trim(), jdText.trim(), template);
     res.json(result);
   } catch (err) {
     const status = err?.status && err.status >= 400 && err.status < 600 ? err.status : 500;

@@ -3,7 +3,7 @@ import { Briefcase, Upload } from "lucide-react";
 import { theme } from "../styles/theme";
 import { FileDropZone } from "./FileDropZone";
 
-export function JobDescriptionInput({ value, onChange, onFileUpload, jdFile, parsingJd }) {
+export function JobDescriptionInput({ value, onChange, onFileUpload, jdFile, parsingJd, hideLabel }) {
   const [mode, setMode] = useState("paste");
 
   return (
@@ -12,23 +12,25 @@ export function JobDescriptionInput({ value, onChange, onFileUpload, jdFile, par
         style={{
           display: "flex",
           alignItems: "center",
-          justifyContent: "space-between",
+          justifyContent: hideLabel ? "flex-end" : "space-between",
           marginBottom: 10,
         }}
       >
-        <div
-          style={{
-            display: "flex",
-            alignItems: "center",
-            gap: 7,
-            fontSize: 12.5,
-            fontWeight: 600,
-            letterSpacing: 0.3,
-            color: theme.dim,
-          }}
-        >
-          <Briefcase size={15} style={{ color: theme.accent }} /> JOB DESCRIPTION
-        </div>
+        {!hideLabel && (
+          <div
+            style={{
+              display: "flex",
+              alignItems: "center",
+              gap: 7,
+              fontSize: 12.5,
+              fontWeight: 600,
+              letterSpacing: 0.3,
+              color: theme.dim,
+            }}
+          >
+            <Briefcase size={15} style={{ color: theme.accent }} /> JOB DESCRIPTION
+          </div>
+        )}
         <div
           style={{
             display: "flex",
@@ -50,8 +52,8 @@ export function JobDescriptionInput({ value, onChange, onFileUpload, jdFile, par
                 fontSize: 11.5,
                 border: "none",
                 cursor: "pointer",
-                background: mode === tab.id ? theme.accent : "transparent",
-                color: mode === tab.id ? "#1a1205" : theme.dim,
+                background: mode === tab.id ? theme.accentStrong : "transparent",
+                color: mode === tab.id ? "#fff" : theme.dim,
                 fontWeight: mode === tab.id ? 600 : 400,
               }}
             >
@@ -68,7 +70,7 @@ export function JobDescriptionInput({ value, onChange, onFileUpload, jdFile, par
           placeholder="Paste the full job description — responsibilities, requirements, qualifications…"
           style={{
             width: "100%",
-            height: 158,
+            height: 196,
             resize: "none",
             background: theme.bgElevated,
             border: `1px solid ${theme.border}`,
@@ -90,6 +92,7 @@ export function JobDescriptionInput({ value, onChange, onFileUpload, jdFile, par
             parsing={parsingJd}
             label="Drop job description file"
             hint="PDF, DOCX or TXT"
+            minHeight={196}
           />
           {value && (
             <div style={{ marginTop: 8, fontSize: 11.5, color: theme.faint }}>
