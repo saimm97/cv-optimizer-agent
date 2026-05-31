@@ -1,8 +1,16 @@
 import { CheckCircle2, XCircle } from "lucide-react";
 
 const styles = {
-  matched: { bg: "rgba(76,175,111,.12)", bd: "rgba(76,175,111,.4)", c: "#6fd49a" },
-  missing: { bg: "rgba(232,103,91,.1)", bd: "rgba(232,103,91,.4)", c: "#f0918a" },
+  matched: {
+    bg: "var(--pill-matched-bg)",
+    bd: "var(--pill-matched-bd)",
+    c: "var(--pill-matched-c)",
+  },
+  missing: {
+    bg: "var(--pill-missing-bg)",
+    bd: "var(--pill-missing-bd)",
+    c: "var(--pill-missing-c)",
+  },
 };
 
 export function KeywordPill({ text, kind }) {

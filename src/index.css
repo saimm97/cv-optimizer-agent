@@ -10,17 +10,83 @@ body {
   padding: 0;
 }
 
+/* ---- Theme tokens ---- */
+:root,
+:root[data-theme="dark"] {
+  --bg: #0a0c12;
+  --bg-elevated: #0e1119;
+  --panel: #141823;
+  --panel2: #1a1f2c;
+  --panel-hover: #202636;
+  --border: rgba(255, 255, 255, 0.07);
+  --border-light: rgba(255, 255, 255, 0.13);
+  --text: #f3f5f9;
+  --dim: #a3abba;
+  --faint: #697080;
+  --accent: #8b8cff;
+  --accent-strong: #6d6cf0;
+  --accent-soft: rgba(124, 108, 255, 0.13);
+  --shadow: 0 16px 48px rgba(0, 0, 0, 0.48);
+  --shadow-soft: 0 2px 16px rgba(0, 0, 0, 0.3);
+  --glow: 0 0 0 1px rgba(124, 108, 255, 0.3), 0 12px 32px rgba(124, 108, 255, 0.16);
+  --grad-text: linear-gradient(135deg, #bcb9ff 0%, #8b8cff 55%, #a78bfa 100%);
+  --glass: rgba(20, 24, 35, 0.82);
+  --pill-matched-bg: rgba(76, 175, 111, 0.12);
+  --pill-matched-bd: rgba(76, 175, 111, 0.4);
+  --pill-matched-c: #6fd49a;
+  --pill-missing-bg: rgba(232, 103, 91, 0.1);
+  --pill-missing-bd: rgba(232, 103, 91, 0.4);
+  --pill-missing-c: #f0918a;
+  --bg-image: radial-gradient(1000px 560px at 8% -10%, rgba(124, 108, 255, 0.14), transparent 60%),
+    radial-gradient(820px 520px at 98% -4%, rgba(56, 189, 248, 0.09), transparent 55%),
+    radial-gradient(760px 620px at 50% 116%, rgba(167, 139, 250, 0.08), transparent 60%);
+}
+
+:root[data-theme="light"] {
+  --bg: #f4f6fb;
+  --bg-elevated: #ffffff;
+  --panel: #ffffff;
+  --panel2: #f1f4f9;
+  --panel-hover: #e8edf5;
+  --border: rgba(15, 23, 42, 0.1);
+  --border-light: rgba(15, 23, 42, 0.16);
+  --text: #131a2b;
+  --dim: #5b6678;
+  --faint: #8a93a6;
+  --accent: #5b54e6;
+  --accent-strong: #4f46e5;
+  --accent-soft: rgba(99, 91, 235, 0.1);
+  --shadow: 0 18px 44px rgba(20, 27, 52, 0.12);
+  --shadow-soft: 0 2px 14px rgba(20, 27, 52, 0.08);
+  --glow: 0 0 0 1px rgba(99, 91, 235, 0.35), 0 12px 30px rgba(99, 91, 235, 0.18);
+  --grad-text: linear-gradient(135deg, #6d6cf0 0%, #7c3aed 55%, #6d28d9 100%);
+  --glass: rgba(255, 255, 255, 0.82);
+  --pill-matched-bg: rgba(22, 135, 78, 0.12);
+  --pill-matched-bd: rgba(22, 135, 78, 0.32);
+  --pill-matched-c: #15803d;
+  --pill-missing-bg: rgba(200, 50, 40, 0.09);
+  --pill-missing-bd: rgba(200, 50, 40, 0.28);
+  --pill-missing-c: #b91c1c;
+  --bg-image: radial-gradient(1000px 560px at 8% -10%, rgba(124, 108, 255, 0.1), transparent 60%),
+    radial-gradient(820px 520px at 98% -4%, rgba(56, 189, 248, 0.08), transparent 55%),
+    radial-gradient(760px 620px at 50% 116%, rgba(167, 139, 250, 0.08), transparent 60%);
+}
+
 body {
-  background: #0a0c10;
-  background-image:
-    radial-gradient(900px 500px at 12% -8%, rgba(224, 177, 94, 0.10), transparent 60%),
-    radial-gradient(800px 500px at 95% 0%, rgba(106, 160, 255, 0.08), transparent 55%),
-    radial-gradient(700px 600px at 50% 110%, rgba(62, 208, 192, 0.06), transparent 60%);
+  background: var(--bg);
+  background-image: var(--bg-image);
   background-attachment: fixed;
-  color: #eef1f6;
+  color: var(--text);
   font-family: "Inter", system-ui, sans-serif;
   -webkit-font-smoothing: antialiased;
   text-rendering: optimizeLegibility;
+  transition: background-color 0.25s ease, color 0.25s ease;
+}
+
+/* Selection */
+::selection {
+  background: rgba(124, 108, 255, 0.3);
+  color: #fff;
 }
 
 /* Scrollbar */
@@ -32,13 +98,13 @@ body {
   background: transparent;
 }
 ::-webkit-scrollbar-thumb {
-  background: #2a313d;
+  background: var(--border-light);
   border-radius: 8px;
   border: 3px solid transparent;
   background-clip: content-box;
 }
 ::-webkit-scrollbar-thumb:hover {
-  background: #3a4350;
+  background: var(--faint);
   background-clip: content-box;
 }
 
@@ -74,13 +140,13 @@ body {
 
 /* Inputs */
 textarea::placeholder {
-  color: #646e7e;
+  color: var(--faint);
 }
 textarea:focus,
 input:focus {
   outline: none;
-  border-color: #e0b15e !important;
-  box-shadow: 0 0 0 3px rgba(224, 177, 94, 0.12);
+  border-color: var(--accent) !important;
+  box-shadow: 0 0 0 3px var(--accent-soft);
 }
 
 /* Interactive helpers */
@@ -96,8 +162,8 @@ input:focus {
 }
 .cta:hover:not(:disabled) {
   transform: translateY(-1px);
-  filter: brightness(1.05);
-  box-shadow: 0 10px 30px rgba(224, 177, 94, 0.28);
+  filter: brightness(1.06);
+  box-shadow: 0 12px 34px rgba(124, 108, 255, 0.38);
 }
 .cta:active:not(:disabled) {
   transform: translateY(0);

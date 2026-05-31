@@ -17,8 +17,11 @@ export function useCVOptimizer() {
   const [cvText, setCvText] = useState("");
   const [jdText, setJdText] = useState("");
   const [jdFile, setJdFile] = useState(null);
+  const [templateFile, setTemplateFile] = useState(null);
+  const [templateText, setTemplateText] = useState("");
   const [parsingCv, setParsingCv] = useState(false);
   const [parsingJd, setParsingJd] = useState(false);
+  const [parsingTemplate, setParsingTemplate] = useState(false);
   const [analyzing, setAnalyzing] = useState(false);
   const [phase, setPhase] = useState("");
   const [apiReady, setApiReady] = useState(true);
@@ -80,6 +83,33 @@ export function useCVOptimizer() {
     setResult(null);
   }, []);
 
+  const handleTemplateFile = useCallback(async (file) => {
+    setError("");
+    setParsingTemplate(true);
+    setTemplateFile(file);
+    setResult(null);
+
+    try {
+      const text = await parseFile(file);
+      if (!text || text.length < 20) {
+        throw new Error("Couldn't read this template. Try a different PDF/DOCX/TXT.");
+      }
+      setTemplateText(text);
+    } catch (err) {
+      setError(err.message);
+      setTemplateFile(null);
+      setTemplateText("");
+    } finally {
+      setParsingTemplate(false);
+    }
+  }, []);
+
+  const clearTemplate = useCallback(() => {
+    setTemplateFile(null);
+    setTemplateText("");
+    setResult(null);
+  }, []);
+
   const runAnalysis = async () => {
     setError("");
     setResult(null);
@@ -104,7 +134,7 @@ export function useCVOptimizer() {
     }, 6000);
 
     try {
-      const analysis = await analyzeCV(cvText, jdText);
+      const analysis = await analyzeCV(cvText, jdText, templateText);
       setResult(analysis);
       setActiveTab("report");
     } catch (err) {
@@ -121,8 +151,11 @@ export function useCVOptimizer() {
     cvText,
     jdText,
     jdFile,
+    templateFile,
+    templateText,
     parsingCv,
     parsingJd,
+    parsingTemplate,
     analyzing,
     phase,
     apiReady,
@@ -133,6 +166,8 @@ export function useCVOptimizer() {
     handleCvFile,
     handleJdFile,
     handleJdTextChange,
+    handleTemplateFile,
+    clearTemplate,
     runAnalysis,
   };
 }

@@ -33,7 +33,7 @@ async function extractRequirements(jdText) {
   }
 }
 
-export async function optimizeCv(cvText, jdText) {
+export async function optimizeCv(cvText, jdText, templateText = "") {
   // The deterministic ATS scan always runs — it needs no API key.
   const atsFindings = runAtsAnalysis(cvText, jdText);
 
@@ -46,10 +46,10 @@ export async function optimizeCv(cvText, jdText) {
     // Stage 1: requirement extraction (LLM).
     const requirements = await extractRequirements(jdText);
 
-    // Stage 2: grounded analysis + optimized CV.
+    // Stage 2: grounded analysis + optimized CV (optionally template-formatted).
     const llm = await callClaudeJson({
       system: SYSTEM_PROMPT,
-      message: buildAnalysisMessage(cvText, jdText, requirements, atsFindings),
+      message: buildAnalysisMessage(cvText, jdText, requirements, atsFindings, templateText),
       label: "CV analysis",
     });
 
